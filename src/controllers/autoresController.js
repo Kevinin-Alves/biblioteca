@@ -1,4 +1,5 @@
 //import mongoose from "mongoose";
+import NaoEncontrado from "../middlewares/NaoEncontrado.js";
 import autores from "../models/Autor.js";
 
 class AutorController {
@@ -10,26 +11,34 @@ class AutorController {
       res.status(200).json(autoresResultado);
 
     } catch (erro) {
+
       next(erro);
+
     }
   }
 
   static listarAutorPorId = async (req, res, next) => {
 
     try {
+
       const id = req.params.id;
 
       const autorResultado = await autores.findById(id);
 
       if (autorResultado !== null) {
+
         res.status(200).send(autorResultado);
+
       } else {
-        res.status(404).send({ message: "Id do Autor não localizado." });
+
+        next(new NaoEncontrado("Id do Autor não localizado."));
+
       }
     } catch (erro) {
       //verifica se o dado foi passado de forma incorreta
       next(erro);
     }
+
   };
 
   static cadastrarAutor = async (req, res, next) => {
@@ -39,8 +48,11 @@ class AutorController {
       const autorResultado = await autor.save();
 
       res.status(201).send(autorResultado.toJSON());
+
     } catch (erro) {
+
       next(erro);
+
     }
   }
 
@@ -48,10 +60,19 @@ class AutorController {
     try {
       const id = req.params.id;
 
-      await autores.findByIdAndUpdate(id, { $set: req.body });
+      const autorResultado = await autores.findByIdAndUpdate(id, { $set: req.body });
 
-      res.status(200).send({ message: "Autor atualizado com sucesso" });
+      if (autorResultado !== null) {
+
+        res.status(200).send({message: "Atualizado com sucesso!"});
+
+      } else {
+
+        next(new NaoEncontrado("Id do Autor não localizado."));
+
+      }
     } catch (erro) {
+      //verifica se o dado foi passado de forma incorreta
       next(erro);
     }
   }
@@ -60,15 +81,25 @@ class AutorController {
     try {
       const id = req.params.id;
 
-      await autores.findByIdAndDelete(id);
+      const autorResultado = await autores.findByIdAndDelete(id);
 
-      res.status(200).send({ message: "Autor removido com sucesso" });
+      if(autorResultado !== autorResultado){
+
+        res.status(200).send({ message: "Autor removido com sucesso" });
+
+      } else {
+
+        next(new NaoEncontrado("Id do Autor não localizado."));
+
+      }
     } catch (erro) {
+
       next(erro);
+
     }
   }
 
-
+  
 }
 
 export default AutorController
