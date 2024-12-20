@@ -5,7 +5,7 @@ class PedidoController {
 
   static listarPedidos = async (req, res, next) => {
     try {
-      const pedidosResultado = await pedidos.find().populate("itens.livro").exec();
+      const pedidosResultado = await pedidos.find().populate("itens.livro","titulo").exec();
 
       res.status(200).json(pedidosResultado);
 
@@ -18,7 +18,7 @@ class PedidoController {
     try {
       const id = req.params.id;
 
-      const pedidoResultado = await pedidos.findById(id).populate("itens.livro").exec();
+      const pedidoResultado = await pedidos.findById(id).populate("itens.livro","titulo").exec();
 
       if (pedidoResultado !== null) {
         res.status(200).send(pedidoResultado);
